@@ -43,7 +43,13 @@ def extract_movies():
                 "rating": "8.5",
                 "poster": "url_to_poster",
                 "year": "2023",
-                "plot": "Movie plot summary"
+                "plot": "Movie plot summary",
+                "imdbID": "tt1234567",
+                "imdbVotes": "1,234,567",
+                "rottenTomatoesRating": "90%",
+                "metacriticRating": "85/100",
+                "genre": "Action, Adventure",
+                "director": "Director Name"
             },
             ...
         ]
@@ -160,12 +166,25 @@ def get_movie_details(title):
         
         movie_data = response.json()
         if movie_data.get("Response") == "True":
+            # Extract Rotten Tomatoes rating if available
+            rotten_tomatoes_rating = "N/A"
+            for rating in movie_data.get("Ratings", []):
+                if rating.get("Source") == "Rotten Tomatoes":
+                    rotten_tomatoes_rating = rating.get("Value", "N/A")
+                    break
+                    
             return {
                 "title": movie_data.get("Title", title),
                 "rating": movie_data.get("imdbRating", "N/A"),
                 "poster": movie_data.get("Poster", "N/A"),
                 "year": movie_data.get("Year", "N/A"),
-                "plot": movie_data.get("Plot", "N/A")
+                "plot": movie_data.get("Plot", "N/A"),
+                "imdbID": movie_data.get("imdbID", None),
+                "imdbVotes": movie_data.get("imdbVotes", "N/A"),
+                "rottenTomatoesRating": rotten_tomatoes_rating,
+                "metacriticRating": movie_data.get("Metascore", "N/A"),
+                "genre": movie_data.get("Genre", "N/A"),
+                "director": movie_data.get("Director", "N/A")
             }
         else:
             logger.warning(f"Movie not found: {title}")
@@ -174,7 +193,13 @@ def get_movie_details(title):
                 "rating": "N/A",
                 "poster": "N/A",
                 "year": "N/A",
-                "plot": "Movie information not found"
+                "plot": "Movie information not found",
+                "imdbID": None,
+                "imdbVotes": "N/A",
+                "rottenTomatoesRating": "N/A",
+                "metacriticRating": "N/A",
+                "genre": "N/A",
+                "director": "N/A"
             }
             
     except requests.RequestException as e:
@@ -184,7 +209,13 @@ def get_movie_details(title):
             "rating": "Error",
             "poster": "N/A",
             "year": "N/A",
-            "plot": f"Error fetching movie details: {str(e)}"
+            "plot": f"Error fetching movie details: {str(e)}",
+            "imdbID": None,
+            "imdbVotes": "N/A",
+            "rottenTomatoesRating": "N/A",
+            "metacriticRating": "N/A",
+            "genre": "N/A",
+            "director": "N/A"
         }
 
 
